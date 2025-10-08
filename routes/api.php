@@ -17,4 +17,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/CriarUser', [UsuarioController::class, 'storeApi']);
 Route::post('/login', [UsuarioController::class, 'login']);
-
+Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update']);

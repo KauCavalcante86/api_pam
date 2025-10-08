@@ -33,6 +33,7 @@ class UsuarioController extends Controller
 
     public function storeApi(Request $request)
     {
+        dd($request->all());
         $usuario = new Usuario();
         $usuario->nome = $request->nome;
         $usuario->email = $request->email;
@@ -103,7 +104,38 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, Usuario $usuario)
     {
-        //
+        try {
+
+        $request->validate([
+            'nome' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:usuarios,email,' . $usuario->id,
+            'senha' => 'sometimes|string|min:6',
+            'cep' => 'sometimes|string|max:20',
+            'bairro' => 'sometimes|string|max:100',
+            'rua' => 'sometimes|string|max:100',
+            'cidade' => 'sometimes|string|max:100',
+            'uf' => 'sometimes|string|max:2',
+        ]);
+
+            $dados = $request->all();
+
+            if ($request->has('senha') && $request->senha) {
+                $dados['senha'] = Hash::make($request->senha);
+            }
+
+            $usuario->update($dados);
+
+            return response()->json([
+                'message' => 'Usuário atualizado com sucesso!',
+                'usuario' => $usuario
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response() ->json([
+                'message' => 'Erro ao atualizar o usuário.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
