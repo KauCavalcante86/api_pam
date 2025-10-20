@@ -31,25 +31,36 @@ class UsuarioController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function storeApi(Request $request)
-    {
-        dd($request->all());
-        $usuario = new Usuario();
-        $usuario->nome = $request->nome;
-        $usuario->email = $request->email;
-        $usuario->senha = Hash::make($request->senha);
-        $usuario->cep = $request->cep;
-        $usuario->bairro = $request->bairro;
-        $usuario->rua = $request->rua;
-        $usuario->cidade = $request->cidade;
-        $usuario->uf = $request->uf;
-        $usuario->save();
+public function storeApi(Request $request)
+{
+    // Remova essa linha:
+    // dd($request->all());
+    
+    // Validação básica (recomendo adicionar)
+    $request->validate([
+        'nome' => 'required|string|max:255',
+        'email' => 'required|email|unique:usuarios,email',
+        'senha' => 'required|string|min:6',
+        // Você pode validar os demais campos se quiser
+    ]);
 
-        return response()->json([
-            'message' => 'Usuário criado com sucesso!',
-            'usuario' => $usuario
-        ],201);
-    }
+    $usuario = new Usuario();
+    $usuario->nome = $request->nome;
+    $usuario->email = $request->email;
+    $usuario->senha = Hash::make($request->senha);
+    $usuario->cep = $request->cep ?? null;
+    $usuario->bairro = $request->bairro ?? null;
+    $usuario->rua = $request->rua ?? null;
+    $usuario->cidade = $request->cidade ?? null;
+    $usuario->uf = $request->uf ?? null;
+    $usuario->save();
+
+    return response()->json([
+        'message' => 'Usuário criado com sucesso!',
+        'usuario' => $usuario
+    ], 201);
+}
+
 
   public function login(Request $request)
 {
